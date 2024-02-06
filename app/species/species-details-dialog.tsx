@@ -16,44 +16,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/use-toast";
 import { createBrowserSupabaseClient } from "@/lib/client-utils";
 import { type Database } from "@/lib/schema";
+import { kingdoms, speciesSchema } from "@/lib/species-schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState, type BaseSyntheticEvent, type MouseEvent } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { type z } from "zod";
 
 // Extract Species type from Supabase schema
 type Species = Database["public"]["Tables"]["species"]["Row"];
-
-// Define kingdom enum for use in Zod schema and displaying dropdown options in the form
-const kingdoms = z.enum(["Animalia", "Plantae", "Fungi", "Protista", "Archaea", "Bacteria"]);
-
-// Use Zod to define the shape + requirements of a Species entry; used in form validation
-const speciesSchema = z.object({
-  scientific_name: z
-    .string()
-    .trim()
-    .min(1)
-    .transform((val) => val?.trim()),
-  common_name: z
-    .string()
-    .nullable()
-    // Transform empty string or only whitespace input to null before form submission, and trim whitespace otherwise
-    .transform((val) => (!val || val.trim() === "" ? null : val.trim())),
-  kingdom: kingdoms,
-  total_population: z.number().int().positive().min(1).nullable(),
-  image: z
-    .string()
-    .url()
-    .nullable()
-    // Transform empty string or only whitespace input to null before form submission, and trim whitespace otherwise
-    .transform((val) => (!val || val.trim() === "" ? null : val.trim())),
-  description: z
-    .string()
-    .nullable()
-    // Transform empty string or only whitespace input to null before form submission, and trim whitespace otherwise
-    .transform((val) => (!val || val.trim() === "" ? null : val.trim())),
-});
 
 export default function SpeciesDetailsDialog({ species, currentUser }: { species: Species; currentUser: string }) {
   const router = useRouter();
