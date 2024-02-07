@@ -2,7 +2,7 @@ import { Separator } from "@/components/ui/separator";
 import { TypographyH2 } from "@/components/ui/typography";
 import { createServerSupabaseClient } from "@/lib/server-utils";
 import { redirect } from "next/navigation";
-import SpeciesCard from "./species-card";
+import UserCard from "./user-card";
 
 export default async function Users() {
   // Create supabase server component client and obtain user session from stored cookie
@@ -16,10 +16,7 @@ export default async function Users() {
     redirect("/");
   }
 
-  // Obtain the ID of the currently signed-in user
-  const sessionId = session.user.id;
-
-  const { data: species } = await supabase.from("profiles").select("*").order("id", { ascending: false });
+  const { data: profiles } = await supabase.from("profiles").select("*").order("id", { ascending: false });
 
   return (
     <>
@@ -28,7 +25,7 @@ export default async function Users() {
       </div>
       <Separator className="my-4" />
       <div className="flex flex-wrap justify-center">
-        {species?.map((species) => <SpeciesCard key={species.id} species={species} currentUser={sessionId} />)}
+        {profiles?.map((profiles) => <UserCard key={profiles.id} users={profiles} />)}
       </div>
     </>
   );
